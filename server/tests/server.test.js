@@ -4,9 +4,16 @@ const request = require('supertest');
 const {app} = require('../server');
 const {Todo} = require('../model/todo');
 
+const todos =[
+    {text : 'First test todo'},
+    {text: 'Second test todo'}
+]
+
 //empty the database before each start
 beforeEach((done)=>{
-    Todo.remove({}).then(()=>done());
+    Todo.remove({}).then(()=>{
+        return Todo.insertMany(todos);
+    }).then(()=> done());
 });
 
 describe('POST /todos', ()=>{
@@ -26,10 +33,10 @@ describe('POST /todos', ()=>{
                 }
 
                 Todo.find().then((todos)=> {
-                    expect(todos.length).toBe(1);
-                    expect(todos[0].text).toBe(text);
+                    expect(todos.length).toBe(3);
+                    expect(todos[2].text).toBe(text);
                     done();
-                }).catch((error)=>done(e));
+                }).catch((error) => done(error));
             });
     });
 
@@ -39,9 +46,35 @@ describe('POST /todos', ()=>{
             .send({})
             .expect(400)
             .end((error, resp)=>{
+                if(error){
+                    return done();
+                }
                 Todo.find().then((todos)=>{
-                    expect(todos.length).toBe(1);
+                    expect(todos.length).toBe(2);
+                    done();
                 }).catch((error) => done(error));
             });
     });
+});
+
+describe('GET /todos', () => {
+        it('should return all list of todos', (done) => {
+            request(app)
+                .get('/todos')
+                .expect(200)
+                .expect((resp) =>{
+                    expect(resp.body.todos.length).toBe(2);
+                })
+                .end((error, resp)=>{
+                    if(error){
+                        return done(error);
+                    }
+
+                    // check the db lenght
+                    Todo.find().then((todos)=>{
+                        expect(todos.length).toBe(2);
+                        done();
+                    }).catch(error => done(error));
+                });
+        });
 });

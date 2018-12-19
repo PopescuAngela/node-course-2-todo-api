@@ -25,11 +25,20 @@ app.post('/todos', (request, response)=>{
     });
 });
 
-//read
-app.get('/todos', (request, response)=>{
-
-})
+//get all
+app.get('/todos', (request, response)=> {
+    Todo.find().then((todos)=>{
+        response.send({
+            todos
+        });
+    }, (error)=>{
+        response.status(400);
+        response.send(error);
+    });
+});
 
 app.listen(3000, ()=> {
     console.log('Started on 3000 port!');
 });
+
+module.exports = {app}
