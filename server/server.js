@@ -8,6 +8,8 @@ var {User} = require('./model/user');
 
 var app = express();
 
+const port = process.env.PORT || 3000;
+
 //configure the midleware
 app.use(bodyParser.json());
 
@@ -57,8 +59,8 @@ app.get('/todos/:id', (request, response)=>{
     });
 });
 
-app.listen(3000, ()=> {
-    console.log('Started on 3000 port!');
+app.listen(port, ()=> {
+    console.log(`Started on ${port} port!`);
 });
 
 module.exports = {app}
