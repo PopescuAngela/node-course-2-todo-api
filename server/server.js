@@ -59,6 +59,27 @@ app.get('/todos/:id', (request, response)=>{
     });
 });
 
+// delete one document by ID
+app.delete('/todos/:id', (request, response)=> {
+    var requestId = request.params.id;
+    if(!ObjectID.isValid(requestId)) {
+       return response.status(404)
+                .send({});
+    }
+
+    Todo.findByIdAndRemove(requestId).then((removedTodo)=> {
+        if(!removedTodo) {
+            console.log(`The document with id ${requestId} was not found.`);
+            return response.status(404).send({});
+        }
+
+        response.status(200).send({removedTodo});
+    }).catch( (error) =>{
+        response.status(400)
+        .send({});
+    });
+});
+
 app.listen(port, ()=> {
     console.log(`Started on ${port} port!`);
 });
