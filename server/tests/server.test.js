@@ -14,7 +14,9 @@ const todos =[
         _id: new ObjectID(),
         text: 'Second test todo'
     }
-]
+];
+
+var newId = new ObjectID;
 
 //empty the database before each start
 beforeEach((done)=>{
@@ -98,7 +100,6 @@ describe('GET /todos/:id', () => {
     });
 
     it('Should return 404 if todo not found', (done)=>{
-        var newId = new ObjectID;
         request(app)
             .get(`/todos/${newId.toHexString()}`)
             .expect(404)
@@ -114,6 +115,44 @@ describe('GET /todos/:id', () => {
         .expect(404)
         .expect((resp)=> {
             expect(resp.body).toBeNull;
+        })
+        .end(done);
+    });
+});
+
+describe('DELETE /todos/:id', ()=>{
+    it('Should delete a todo', (done) =>{
+        request(app)
+            .delete(`/todos/${todos[0]._id.toHexString()}`)
+            .expect(200)
+            .expect((resp)=>{
+                expect(resp.body.text).toBe(todos[0]._text);
+            })
+            .end((error, resp)=>{
+                Todo.find().then((todos)=>{
+                    expect(todos.length).toBe(1);
+                    done();
+                }).catch((error) => done(error));
+            });
+    });
+
+    it('Should return 404 if todo not found', (done) =>{
+        var id = new ObjectID;
+        request(app)
+        .delete(`/todos/${id.toHexString()}`)
+        .expect(404)
+        .expect((resp)=>{
+            expect(resp.body.text).toBeNull;
+        })
+        .end(done);
+    });
+
+    it('Should return 404 if object id is invalid', (done) =>{
+        request(app)
+        .delete(`/todos/123`)
+        .expect(404)
+        .expect((resp)=>{
+            expect(resp.body.text).toBeNull;
         })
         .end(done);
     });

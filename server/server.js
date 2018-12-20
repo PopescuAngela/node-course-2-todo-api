@@ -67,14 +67,14 @@ app.delete('/todos/:id', (request, response)=> {
                 .send({});
     }
 
-    Todo.findByIdAndRemove(requestId).then((removedTodo)=> {
-        if(!removedTodo) {
+    Todo.findByIdAndRemove(requestId).then((todo)=> {
+        if(!todo) {
             console.log(`The document with id ${requestId} was not found.`);
             return response.status(404).send({});
         }
-
-        response.status(200).send({removedTodo});
-    }).catch( (error) =>{
+        response.status(200).send({todo});
+    }).catch( (error) => {
+        console.log(error);
         response.status(400)
         .send({});
     });
