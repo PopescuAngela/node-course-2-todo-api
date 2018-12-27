@@ -1,3 +1,4 @@
+require('./config/config');
 const express = require('express');
 const bodyParser = require('body-parser')
 const {ObjectID} = require('mongodb');
@@ -11,6 +12,7 @@ var app = express();
 
 const port = process.env.PORT || 3000;
 
+require('./controller/user-controller');
 //configure the midleware
 app.use(bodyParser.json());
 
@@ -112,6 +114,25 @@ app.patch('/todos/:id', (request, response)=>{
        }
        );
 
+});
+
+//create new user
+app.post('/users', (request, response)=>{
+    var body = _.pick(request.body, ['email', 'password']); 
+    var user = new User(body);
+
+    user.save().then((user)=> {
+        // response.status(200);
+        // response.send(user);
+        return user.generateAuthToken();
+    }, (e) =>{
+        response.status(400);
+        response.send(e);
+    }).then((token)=>{
+        // set the header
+        response.header('x-auth', token);
+        response.send(user);
+    });
 });
 
 app.listen(port, ()=> {

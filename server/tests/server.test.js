@@ -4,6 +4,8 @@ const {ObjectID} = require('mongodb');
 
 const {app} = require('../server');
 const {Todo} = require('../model/todo');
+const {User} = require('../model/user');
+
 
 const todos =[
     {
@@ -12,9 +14,17 @@ const todos =[
     },
     {
         _id: new ObjectID(),
-        text: 'Second test todo'
+        text: 'Second test todo',
+        completed : true,
+        completed: 333
     }
 ];
+
+const users= [{
+    _id: new ObjectID(),
+    email : 'angela@gmail.com',
+    password: '123456789'
+},];
 
 var newId = new ObjectID;
 
@@ -23,6 +33,10 @@ beforeEach((done)=>{
     Todo.remove({}).then(()=>{
         return Todo.insertMany(todos);
     }).then(()=> done());
+
+    User.remove({}).then(()=>{
+        return User.insertMany(users);
+    });
 });
 
 describe('POST /todos', ()=>{
@@ -155,5 +169,92 @@ describe('DELETE /todos/:id', ()=>{
             expect(resp.body.text).toBeNull;
         })
         .end(done);
+    });
+});
+
+describe('PATCH /todos/:id', ()=>{
+
+    it('Should update completed to true', (done)=>{
+        request(app)
+        .patch(`/todos/${todos[0]._id.toHexString()}`)
+        .send({
+            completed: true
+        })
+        .expect(200)
+        .expect((resp)=>{
+            expect(resp.body.completed).toBe('true');
+            expect(resp.body.completedAt).toNotBe(null);
+        })
+        .end((error, resp)=>{
+            Todo.find().then((todos)=>{
+                expect(todos.length).toBe(2);
+                done();
+            }).catch((error) => done(error));
+        });
+    });
+
+    it('Should update completed to false', (done)=>{
+        request(app)
+        .patch(`/todos/${todos[0]._id.toHexString()}`)
+        .send({
+            completed: false
+        })
+        .expect(200)
+        .expect((resp)=>{
+            expect(resp.body.completed).toBe('false');
+            expect(resp.body.completedAt).toBe(null);
+        })
+        .end((error, resp)=>{
+            Todo.find().then((todos)=>{
+                expect(todos.length).toBe(2);
+                done();
+            }).catch((error) => done(error));
+        });
+    });
+});
+
+describe('POST /users', ()=>{
+    const emailValue = 'angela.babarada@yahoo.com';
+
+    it('should create a new user', (done)=>{
+        request(app)
+            .post('/users')
+            .send({
+                email: emailValue,
+                password:"12345678"
+            })
+            .expect(200)
+            .expect((resp)=>{
+                expect(resp.body.email).toBe(emailValue);
+                })
+            .end((error, resp)=>{
+                if(error) {
+                  return done();
+                }
+
+                User.find().then((users)=> {
+                    expect(users.length).toBe(2);
+                    expect(users[1].email).toBe(emailValue);
+                    done();
+                }).catch((error) => done(error));
+            });
+    });
+
+    it('should not create new user ', (done)=>{
+        request(app)
+            .post('/users')
+            .send({ 
+                email: emailValue,
+                password:"12345678"})
+            .expect(400)
+            .end((error, resp)=>{
+                if(error){
+                    return done();
+                }
+                User.find().then((users)=>{
+                    expect(users.length).toBe(1);
+                    done();
+                }).catch((error) => done(error));
+            });
     });
 });

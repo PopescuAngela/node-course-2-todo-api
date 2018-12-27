@@ -1,8 +1,8 @@
-console.log('process.env.NODE_ENV ******', process.env.NODE_ENV);
-console.log('process.env.MONGODB_URI ******', process.env.MONGODB_URI);
+// console.log('process.env.NODE_ENV ******', process.env.NODE_ENV);
+// console.log('process.env.MONGODB_URI ******', process.env.MONGODB_URI);
 const env = process.env.NODE_ENV || 'development';
-console.log('env ******', env);
-console.log('MONGODB_URI ******', process.env.MONGODB_URI);
+// console.log('env ******', env);
+// console.log('MONGODB_URI ******', process.env.MONGODB_URI);
 
 // env variable
 //1. Heroku env 'production'
@@ -18,5 +18,5 @@ if(env === 'development') {
 
 }
 
-console.log('*** env ******', env);
-console.log('*** MONGODB_URI ******', process.env.MONGODB_URI);
+console.log('env ******', env);
+console.log('MONGODB_URI ******', process.env.MONGODB_URI);
