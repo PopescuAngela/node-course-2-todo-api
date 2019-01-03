@@ -1,5 +1,22 @@
 const {SHA256} = require('crypto-js');
 const jwt =require('jsonwebtoken');
+const bycript = require('bcryptjs');
+
+var password ="123abc!";
+bycript.genSalt(10,(err,salt)=>{
+    bycript.hash(password, salt, (error,hash)=>{
+        console.log('Hashed pass', hash);
+    })
+});
+
+var hashedPassword='$2a$10$0.Su6yligK2HbBisO12QxedVy5DmiTNemdPP2dHzeWdUqgO6B7vTK';
+
+bycript.compare(password, hashedPassword, (error,res)=>{
+    console.log('Response',res);
+});
+
+
+
 
 // var messafe ='I am user number 3';
 // var hash = SHA256(messafe). toString();
