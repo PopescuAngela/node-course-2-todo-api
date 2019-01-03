@@ -52,7 +52,7 @@ UserSchema.methods.generateAuthToken = function () {
     });
 };
 
-// overwrite a method
+// overwrite a instance method
 UserSchema.methods.toJSON = function (){
     var user = this;
     // get the user mongo object
@@ -61,7 +61,28 @@ UserSchema.methods.toJSON = function (){
     return _.pick(userObject, ['_id', 'email']);
 }
 
-// create the schema for user
+// create the schema for model user
+UserSchema.statics.findByToken = function(token){
+    var User = this;
+    var decoded;
+
+    try {
+        decoded = jwt.verify(token, 'abc123');
+    } catch (e) {
+        return new Promise((resolve, reject) =>{
+            reject();
+        })
+    }
+
+    console.log('Decoded value:', decoded);
+    
+    return User.findOne({
+        '_id': decoded._id,
+        'tokens.token': token,
+        'tokens.access': 'auth'
+    });
+};
+
 var User = mongoose.model('User', UserSchema);
 
 

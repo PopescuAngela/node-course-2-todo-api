@@ -7,6 +7,7 @@ const _= require('lodash');
 var {mongoose} = require('./db/mongoose')
 var {Todo} = require('./model/todo');
 var {User} = require('./model/user');
+var autheticate = require('./middleware/authenticate');
 
 var app = express();
 
@@ -133,6 +134,10 @@ app.post('/users', (request, response)=>{
         response.header('x-auth', token);
         response.send(user);
     });
+});
+
+app.get('/users/me', autheticate.authenticate, (request, response) =>{
+   response.send(request.user);s
 });
 
 app.listen(port, ()=> {
