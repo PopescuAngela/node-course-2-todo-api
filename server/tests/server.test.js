@@ -6,25 +6,28 @@ const {app} = require('../server');
 const {Todo} = require('../model/todo');
 const {User} = require('../model/user');
 
+const userOneId = new ObjectID();
 
 const todos =[
     {
         _id: new ObjectID(),
-        text : 'First test todo'
+        text : 'First test todo',
+        _creator : userOneId
     },
     {
         _id: new ObjectID(),
         text: 'Second test todo',
         completed : true,
-        completed: 333
+        completed: 333,
+        _creator: userOneId
     }
 ];
 
 const users= [{
-    _id: new ObjectID(),
+    _id: userOneId,
     email : 'angela@gmail.com',
     password: '123456789'
-},];
+}];
 
 var newId = new ObjectID;
 
@@ -45,6 +48,7 @@ describe('POST /todos', ()=>{
         var text = 'Test todo text';
         request(app)
             .post('/todos')
+            .set('x-auth', users[0].tokens[0].token)
             .send({text})
             .expect(200)
             .expect((resp)=>{
@@ -66,6 +70,7 @@ describe('POST /todos', ()=>{
     it('should not create to do ', (done)=>{
         request(app)
             .post('/todos')
+            .set('x-auth', users[0].tokens[0].token)
             .send({})
             .expect(400)
             .end((error, resp)=>{
@@ -84,6 +89,7 @@ describe('GET /todos', () => {
         it('should return all list of todos', (done) => {
             request(app)
                 .get('/todos')
+                .set('x-auth', users[0].tokens[0].token)
                 .expect(200)
                 .expect((resp) =>{
                     expect(resp.body.todos.length).toBe(2);
@@ -106,6 +112,7 @@ describe('GET /todos/:id', () => {
     it('Should get todo by a given id', (done) =>{
         request(app)
             .get(`/todos/${todos[0]._id.toHexString()}`)
+            .set('x-auth', users[0].tokens[0].token)
             .expect(200)
             .expect((resp)=> {
                 expect(resp.body.todo.text).toBe(todos[0].text);
