@@ -171,8 +171,15 @@ app.post('/users/login', (request, response)=>{
     }).catch((e)=>{
         response.status(400).send({});
     });
-    
-    // hashed password matches with the plain text from body
+});
+
+app.delete('/users/me/token', autheticate.authenticate, (request, response)=>{
+    // detele the token was user on auth middleware
+    request.user.removeToken(request.token).then(()=>{
+        response.status(200).send();    
+    }, () =>{
+        response.status(400).send();
+    });
 });
 
 app.listen(port, ()=> {
