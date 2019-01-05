@@ -117,6 +117,18 @@ app.patch('/todos/:id', (request, response)=>{
 
 });
 
+//get all
+app.get('/users', (request, response)=> {
+    User.find().then((users)=>{
+        response.send({
+            users
+        });
+    }, (error)=>{
+        response.status(400);
+        response.send(error);
+    });
+});
+
 //create new user
 app.post('/users', (request, response)=>{
     var body = _.pick(request.body, ['email', 'password']); 
@@ -138,6 +150,29 @@ app.post('/users', (request, response)=>{
 
 app.get('/users/me', autheticate.authenticate, (request, response) =>{
    response.send(request.user);s
+});
+
+
+app.post('/users/login', (request, response)=>{
+    var body = _.pick(request.body, ['email', 'password']);
+    // find the user
+    User.findByCredentials(body.email, body.password).then((user)=>{                                                    
+        console.log(user);
+        if(!user){
+            console.log('Could not find user with email:', body.email);
+            response.status(404).send({});
+        } else{
+          //return  user.generateAuthToken().then((token)=>{
+                // response.header('x-auth',token);
+                response.status(200);
+                response.send(user);
+            //});
+        }
+    }).catch((e)=>{
+        response.status(400).send({});
+    });
+    
+    // hashed password matches with the plain text from body
 });
 
 app.listen(port, ()=> {
