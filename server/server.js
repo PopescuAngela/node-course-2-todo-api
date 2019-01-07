@@ -10,7 +10,7 @@ var {User} = require('./model/user');
 var {authenticate} = require('./middleware/authenticate');
 
 var app = express();
-
+console.log('---------',process.env.PORT);
 const port = process.env.PORT || 3000;
 
 //configure the midleware
