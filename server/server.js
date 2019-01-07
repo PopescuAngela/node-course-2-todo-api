@@ -13,7 +13,6 @@ var app = express();
 
 const port = process.env.PORT || 3000;
 
-require('./controller/user-controller');
 //configure the midleware
 app.use(bodyParser.json());
 

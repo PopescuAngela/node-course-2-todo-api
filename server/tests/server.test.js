@@ -35,11 +35,12 @@ var newId = new ObjectID;
 beforeEach((done)=>{
     Todo.remove({}).then(()=>{
         return Todo.insertMany(todos);
-    }).then(()=> done());
+    });
 
     User.remove({}).then(()=>{
         return User.insertMany(users);
     });
+    done();
 });
 
 describe('POST /todos', ()=>{
